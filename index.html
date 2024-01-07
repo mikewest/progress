@@ -21,18 +21,18 @@
         --progress-gradient-bottom-from: #433485;
         --progress-gradient-bottom-to: #DD3C6E;
       }
+
       body, html {
         background: var(--body-background);
-        height: -webkit-fill-available;
+        min-height: 100vh;
       }
 
       body {
-        margin: 1em 10em;
+        margin: 0 15%;
         font-family: "Open Sans", sans-serif;
         font-variant-numeric: tabular-nums;
 
-        display: grid;
-        grid-template-columns: 1fr;
+        display: flex;
         justify-content: center; /* centers items horizontally */
         align-items: center; /* centers items vertically */
       }
@@ -46,13 +46,13 @@
         grid-column-gap: 1em;
       }
         #time {
-          font-weight: 700;
+          font-weight: 400;
           font-size: 75px;
           grid-area: 1/1/2/2;
           text-align: right;
         }
         #date {
-          font-weight: 400;
+          font-weight: 700;
           font-size: 75px;
           grid-area: 1/2/2/3;
           font-stretch: 75%;
