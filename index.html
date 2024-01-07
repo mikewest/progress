@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Inexorable Events</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wdth,wght@75,400;100,400;100,700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --body-background: #262f3e;
+        --body-text: #EEE;
+
+        --label-text: #BBB;
+
+        --progress-border: #D6B5E166;
+        --progress-bg-gradient-from: #191C23;
+        --progress-bg-gradient-to: #2D3341;
+        --progress-highlight: rgba(255, 255, 255, 0.35);
+
+        --progress-gradient-top: #D0A9E2;
+        --progress-gradient-bottom-from: #433485;
+        --progress-gradient-bottom-to: #DD3C6E;
+      }
+      body, html {
+        background: var(--body-background);
+      }
+
+      body {
+        margin: 1em 10em;
+        font-family: "Open Sans", sans-serif;
+        font-variant-numeric: tabular-nums;
+      }
+
+      time {
+        color: var(--body-text);
+
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+        grid-column-gap: 1em;
+      }
+        #time {
+          font-weight: 700;
+          font-size: 75px;
+          grid-area: 1/1/2/2;
+          text-align: right;
+        }
+        #date {
+          font-weight: 400;
+          font-size: 75px;
+          grid-area: 1/2/2/3;
+          font-stretch: 75%;
+        }
+
+      label {
+        color: var(--label-text);
+      }
+        label.disabled {
+          opacity: 0.25;
+        }
+
+      #bars {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-column-gap: 1.5em;
+        grid-row-gap: 1em;
+      }
+        #bars .year {
+          grid-area: 1/1/2/5;
+        }
+
+      /*
+        Progress styling partially swiped from Ana Tudor's
+        https://codepen.io/thebabydino/pen/wvqVEMW.
+      */
+      progress {
+        box-sizing: border-box;
+        border: solid 2px var(--progress-border);
+        border-radius: 5px;
+        padding: 5px;
+        width: 100%;
+        height: 1em;
+        background: linear-gradient(var(--progress-bg-gradient-from), var(--progress-bg-gradient-to));
+        font: clamp(0.625em, 7.5vw, 5em) monospace;
+      }
+        progress::-webkit-progress-bar { background: transparent }
+        progress::-webkit-progress-value {
+          border-radius: 5px;
+          box-shadow: inset 0 0.05em 0.05em var(--progress-highlight);
+          background: linear-gradient(#d0a9e2, transparent 85%), 
+                      linear-gradient(90deg, var(--progress-gradient-bottom-from), var(--progress-gradient-bottom-to));
+        }
+        .quarter progress {
+          height: 0.5em;
+        }
+    </style>
+  </head>
+  <body>
+    <time datetime>
+      <span id="time">??:??</span>
+      <span id="date">??? ?</span>
+    </time>
+    <section id="bars">
+      <label class="year">
+        2024 is, prior to script execution, indeterminate.
+        <progress id="year" max="100"></progress>
+      </label>
+      <label class="quarter">
+        2024Q1 is, prior to script execution, indeterminate.
+        <progress id="q1" max="100"></progress>
+      </label>
+      <label class="quarter">
+        2024Q2 is, prior to script execution, indeterminate.
+        <progress id="q2" max="100"></progress>
+      </label>
+      <label class="quarter">
+        2024Q3 is, prior to script execution, indeterminate.
+        <progress id="q3" max="100"></progress>
+      </label>
+      <label class="quarter">
+        2024Q4 is, prior to script execution, indeterminate.
+        <progress id="q4" max="100"></progress>
+      </label>
+    </section>
+
+    <script>
+      const now = new Date();
+
+      // Time
+      document.querySelector('time').dateTime = now.toJSON();
+      document.querySelector("#time").innerText = (new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "numeric", hour12: false })).format(now);
+
+      // Date
+      document.querySelector("#date").innerText = new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric" }).format(now);
+
+      // Percentages
+      const EoQ = [
+        new Date(now.getFullYear(), 0, 1),
+        new Date(now.getFullYear(), 4, 1),
+        new Date(now.getFullYear(), 7, 1),
+        new Date(now.getFullYear(), 10, 1),
+        new Date(now.getFullYear() + 1, 0, 1)
+      ];
+
+      // Entire year.
+      const percent = (now - EoQ[0]) / (EoQ[4] - EoQ[0]) * 100;
+      document.querySelector('progress').value = percent;
+
+      const yearText = `${(100-percent).toFixed(2)}% of ${now.getFullYear()} remains.`;
+      document.querySelector('progress').innerText = yearText;
+      document.querySelector('label').firstChild.textContent = yearText;
+
+      for (let q = 1; q < 5; q++) {
+        const BoQ = EoQ[q - 1];
+        let qPercent = 0;
+        let qEl = document.querySelector(`#q${q}`);
+        if (now > BoQ) {
+          qPercent = (now - BoQ) / (EoQ[q] - BoQ) * 100;
+        }
+        qEl.value = qPercent;
+        let qText = `${(100-qPercent).toFixed(2)}% of ${now.getFullYear()}Q${q} remains.`;
+        if (qPercent === 0) {
+          qEl.parentNode.classList.add('disabled');
+          qText = `${now.getFullYear()}Q${q} has not yet begun.`;
+        }
+        qEl.innerText = qText;
+        qEl.parentNode.firstChild.textContent = qText;
+      }
+    </script>
+  </body>
+</html>
