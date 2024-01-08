@@ -140,7 +140,9 @@
       document.querySelector("#time").innerText = (new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "numeric", hour12: false })).format(now);
 
       // Date
-      document.querySelector("#date").innerText = new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric" }).format(now);
+      const weekday = new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(now);
+      const day = new Intl.DateTimeFormat(undefined, { day: "numeric" }).format(now);
+      document.querySelector("#date").innerText = `$(weekday) $(day)`;
 
       // Percentages
       const EoQ = [
